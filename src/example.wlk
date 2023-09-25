@@ -28,6 +28,11 @@ object personaje {
 	}
 	
 	method puntos() = puntos
+	
+	
+	method chocar() {
+		puntos = puntos - 1
+	} 
 }
 
 class Auto {
@@ -43,6 +48,16 @@ class Auto {
 	}	
 }
 
+class Obstaculo {
+	
+	var property position 
+	var color 
+	
+	method image() = "obstaculo" +  color + ".png"
+
+	method serAgarradaPor(personaje){
+		personaje.chocar()	}	
+}
 
 object juego {
 	method iniciar() {
@@ -52,6 +67,7 @@ object juego {
 		game.title("juego")
 		
 		self.agregarVisuales()
+		self.incorporarObstaculos()
 		self.configurarTeclas()
 		self.definirColisiones()
 
@@ -78,6 +94,20 @@ object juego {
 	method agregarAuto(valor) {
 		game.addVisual( new Auto( position =game.at(valor,10)  ,nro = valor % 5 + 1)) 
 	}
+	method incorporarObstaculos() {
+		game.onTick(2000,"obstaculo",{self.agregarObstaculo()})
+	}
+	method agregarObstaculo() {
+		game.addVisual(
+			new Obstaculo(
+				color= ["Rojo","Verde","Azul"].anyOne(),
+				position = self.posicionAleatoria()
+				)
+			) 
+	}
+	
+	method posicionAleatoria() = 
+		game.at( 1.randomUpTo(game.width()-2), 1.randomUpTo(game.height()-2) )
 }
 
 object puntaje {
@@ -86,5 +116,7 @@ object puntaje {
 	
 	method text() = personaje.puntos().toString()
 	
-	method serAgarradaPor(personaje){}
+	method serAgarradaPor(personaje){
+		game.removeTickEvent("obstaculo")
+	}
 }
